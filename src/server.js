@@ -13,6 +13,23 @@ app.use(cors({ origin: '*', credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'AI limit reached. You have 10 AI requests per hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const aiChatLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  max: 20,
+  message: { error: 'Daily AI chat limit reached. Come back tomorrow!' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use('/api/auth',          require('./routes/auth'));
 app.use('/api/password',       require('./routes/forgot'));
 app.use('/api/password',       require('./routes/forgot'));
@@ -22,7 +39,7 @@ app.use('/api/pods',          require('./routes/pods'));
 app.use('/api/budgets',       require('./routes/budgets'));
 app.use('/api/investments',   require('./routes/investments'));
 app.use('/api/gamification',  require('./routes/gamification'));
-app.use('/api/ai',            require('./routes/ai'));
+app.use('/api/ai',            aiLimiter, aiChatLimiter, require('./routes/ai'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/dashboard',     require('./routes/dashboard'));
 

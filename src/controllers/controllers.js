@@ -165,6 +165,23 @@ const investCtrl = {
     } catch (err) { next(err); }
   },
 
+  update: async (req, res, next) => {
+    try {
+      const { currentPrice, shares, avgPrice } = req.body;
+      const inv = await prisma.investment.findFirst({ where: { id: req.params.id, userId: req.user.id } });
+      if (!inv) return res.status(404).json({ error: 'Investment not found' });
+      const updated = await prisma.investment.update({
+        where: { id: inv.id },
+        data: {
+          ...(currentPrice !== undefined && { currentPrice: Number(currentPrice) }),
+          ...(shares       !== undefined && { shares:       Number(shares) }),
+          ...(avgPrice     !== undefined && { avgPrice:     Number(avgPrice) }),
+        }
+      });
+      res.json(updated);
+    } catch (err) { next(err); }
+  },
+
   remove: async (req, res, next) => {
     try {
       await prisma.investment.deleteMany({ where: { id: req.params.id, userId: req.user.id } });

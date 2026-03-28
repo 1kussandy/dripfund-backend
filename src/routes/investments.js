@@ -7,5 +7,6 @@ router.use(authenticate);
 router.get('/',       investCtrl.list);
 router.post('/',      investCtrl.add);
 router.delete('/:id', investCtrl.remove);
+router.patch('/:id',  investCtrl.update);
 
 module.exports = router;
